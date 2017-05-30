@@ -47,6 +47,9 @@ nmap <leader>vi :tabe $MYVIMRC<cr>
 nmap <leader>so :source $MYVIMRC<cr>
 " Map 0 to start of text on a line instead of column 0
 nmap 0 ^
+" Shortcut for the nohlsearch command
+nmap <leader>h :nohlsearch<cr>
+
 
 " Tell YouCompleteMe to pass the filetype to the function
 let g:ycm_extra_conf_vim_data = [ '&filetype' ]
@@ -91,6 +94,10 @@ set incsearch		" Incremental search
 set autowrite		" Automatically save before commands like :next and :make
 set hidden		" Hide buffers when they are abandoned
 set mouse=a		" Enable mouse usage (all modes)
+
+" Search configuration
+set incsearch   " Highlight while searching
+set hlsearch    " Highlight all matches after entering search pattern
 
 " Source a global configuration file if available
 if filereadable("/etc/vim/vimrc.local")
