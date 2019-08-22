@@ -11,6 +11,11 @@
 " properly set to work with the Vim-related packages available in Debian.
 runtime! debian.vim
 
+" use python3
+let g:pymode_python = 'python3'
+
+
+
 " Vundle
 set nocompatible
 filetype off
@@ -25,16 +30,57 @@ call vundle#begin()
 
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
-Plugin 'Valloric/YouCompleteMe'             " auto completion
-Plugin 'tpope/vim-surround'                 " for editing surround tags
-Plugin 'tpope/vim-repeat'                   " extends . command to plugins
-Plugin 'tpope/vim-commentary'               " shortcuts for adding comments
-Plugin 'ctrlpvim/ctrlp.vim'                 " fuzzy finder
+Plugin 'Valloric/YouCompleteMe'             				" auto completion
+Plugin 'tpope/vim-surround'                 				" for editing surround tags
+Plugin 'tpope/vim-repeat'                   				" extends . command to plugins
+Plugin 'tpope/vim-commentary'               				" shortcuts for adding comments
+Plugin 'tpope/vim-fugitive'						" perform basic git commands without leaving VIM
+Plugin 'scrooloose/nerdtree'						" file tree
+Plugin 'ctrlpvim/ctrlp.vim'                 				" fuzzy finder
+Plugin 'tmhedberg/SimpylFold'						" helps with folding methods and classes
+Plugin 'vim-scripts/indentpython.vim'					" auto-indentation for python
+Plugin 'dense-analysis/ale'						" asynchronous syntax checking
+Plugin 'nvie/vim-flake8'						" PEP 8 checking
+Plugin 'pangloss/vim-javascript'            				" syntax highlighting for JavasScript
+Plugin 'tomlion/vim-solidity'						" syntax highlighting for Solidity (Ethereum)
+Plugin 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}		" status bar for displaying current virtualenv, git branch etc
 
 " all of your Plugins must be added before the following line
 call vundle#end()           " required
 filetype plugin indent on   "required
 filetype on
+
+" Enable folding to collapse methods and classes
+set foldmethod=indent
+set foldlevel=99
+
+" enable folding with the spacebar
+nnoremap <space> za
+
+" show docstrings in folded code
+let g:SimplyFold_docstring_preview=1
+
+" PEP 8 indentation
+au BufNewFile,BufRead *.py
+			\ set tabstop=4 |
+			\ set softtabstop=4 |
+			\ set shiftwidth=4 |
+			\ set textwidth=79 |
+			\ set expandtab |
+			\ set autoindent |
+			\ set fileformat=unix
+
+" for other languages
+au BufNewFile,BufRead *.js,*.html,*.css
+			\ set tabstop=2 |
+			\ set softtabstop=2 |
+			\ set shiftwidth=2
+
+" flag unnecessary whitespace
+" au BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/
+
+" UTF-8
+set encoding=utf-8
 
 " Make CtrlP use ag (ie silver_searcher) for listing the files
 let g:ctrlp_user_command = 'ag %s -l --hidden --nocolor -g'
@@ -55,12 +101,30 @@ nmap <leader>h :nohlsearch<cr>
 let g:ycm_extra_conf_vim_data = [ '&filetype' ]
 " Disable asking for comfirmation
 let g:ycm_confirm_extra_conf = 0
+" close the preview window after completion
+let g:ycm_autoclose_preview_window_after_completion=1
+" goto definition of whatever is under the cursor
+map <leader>g :YcmCompleter GoToDefinitionElseDeclaration<CR>
+
+
+" support for Python and Virtualenv
+py3 << EOF
+import os
+import sys
+if 'VIRTUAL_ENV' in os.environ:
+	project_base_dir = os.environ['VIRTUAL_ENV']
+	activate_this = os.path.join(project_base_dir, 'bin/activate_this.py')
+	execfile(activate_this, dict(__file__=activate_this))
+EOF
 
 
 " Uncomment the next line to make Vim more Vi-compatible
 " NOTE: debian.vim sets 'nocompatible'.  Setting 'compatible' changes numerous
 " options, so any other options should be set AFTER setting 'compatible'.
 "set compatible
+
+
+let python_highlight_all=1
 
 " Vim5 and later versions support syntax highlighting. Uncommenting the next
 " line enables syntax highlighting by default.
@@ -108,12 +172,13 @@ endif
 set number		" Show line numbers by default
 
 " sets point at which text will wrap and highlights area to the right
-set textwidth=80
+set textwidth=120
 highlight OverLength ctermbg=red ctermfg=white guibg=#592929
-match OverLength /\%81v.\+/
+match OverLength /\%121v.\+/
 
 " show existing tab with 4 spaces width
 set tabstop=4
+set softtabstop=4
 set autoindent
 
 " allow for copy from Vim to clipboard
@@ -121,7 +186,7 @@ set clipboard=unnamed
 " when indenting with '>', use 4 spaces width
 set shiftwidth=4
 " On pressing tab, insert 4 spaces
-set expandtab
+set noexpandtab
 
 " Search down into subfolders
 " Provides tab completion for all file-related tasks
@@ -131,12 +196,12 @@ set path+=**
 set wildmenu
 
 " newrw tweaks for file browsing
-let g:netrw_banner=0            " disable banner
+let g:netrw_banner=1            " disable banner
 let g:netrw_browses_split=4     " open in prior window
 let g:netrw_altv=1              " open splits to the right
 let g:netrw_liststyles=3        " tree view
-let g:netrw_list_hide=netrw_gitignore#Hide()
-let g:netrw_list_hide.=',\(^\|\s\s)\zs\.\S\+'
+" let g:netrw_list_hide.=',\(^\|\s\s)\zs\.\S\+'
+" let g:netrw_list_hide=netrw_gitignore#Hide()
 
 " NOW WE CAN
 "  - :edit a folder to open a file browser
@@ -151,4 +216,3 @@ let g:netrw_list_hide.=',\(^\|\s\s)\zs\.\S\+'
 "  - USE ^] to jump to tag under cursor
 "  - Use g^] for ambigous tags
 "  - Use ^t to jump back up the tag stack
-
